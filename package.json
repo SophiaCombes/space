@@ -1,0 +1,16 @@
+{
+  "name": "space-alien-game",
+  "version": "1.0.0",
+  "description": "A pixelated space game with an alien on a planet",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8000 -o"
+  },
+  "keywords": ["game", "p5js", "space"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
+
