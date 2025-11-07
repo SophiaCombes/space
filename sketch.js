@@ -50,10 +50,15 @@ function init() {
     // Create camera
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
     
-    // Create renderer
+    // Create renderer and size it to the game container so the canvas fills the available height
     renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(800, 600);
-    document.body.appendChild(renderer.domElement);
+    renderer.setPixelRatio(window.devicePixelRatio || 1);
+    // Append renderer into the #game-container so side panels can exist
+    const gameContainer = document.getElementById('game-container') || document.body;
+    const cw = Math.max(100, gameContainer.clientWidth);
+    const ch = Math.max(100, gameContainer.clientHeight);
+    renderer.setSize(cw, ch);
+    gameContainer.appendChild(renderer.domElement);
     
     // Enable space lighting (darker but still visible)
     const ambientLight = new THREE.AmbientLight(0x505050, 0.31); // RGB(80,80,80) normalized to 0-1, intensity ~0.31
@@ -288,9 +293,12 @@ function keyReleased(event) {
 }
 
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    const gameContainer = document.getElementById('game-container') || document.body;
+    const cw = Math.max(100, gameContainer.clientWidth);
+    const ch = Math.max(100, gameContainer.clientHeight);
+    camera.aspect = cw / ch;
     camera.updateProjectionMatrix();
-    renderer.setSize(800, 600);
+    renderer.setSize(cw, ch);
 }
 
 // Start the application
