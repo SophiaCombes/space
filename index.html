@@ -3,40 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Alien Game</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            background-color: #000;
-            overflow: hidden;
-            font-family: sans-serif;
-        }
-        canvas {
-            display: block;
-        }
-    </style>
+    <title>The Case Begins - Detective Mystery</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="app" style="height:100vh; display:flex;">
-        <aside id="left-panel" style="width:240px; background:#070814; color:#ddd; box-sizing:border-box; padding:12px; overflow:auto;">
-            <h3 style="margin-top:0;">Options</h3>
-            <p>UI and stuff AAAAAAAAAAAA</p>
-        </aside>
-
-        <main id="game-wrapper" style="flex:1; display:flex; align-items:stretch; justify-content:center;">
-            <!-- game-container will receive the three.js canvas and fill this area -->
-            <div id="game-container" style="width:100%; height:100%; box-sizing:border-box; padding:8px;"></div>
-        </main>
-
-        <aside id="right-panel" style="width:240px; background:#070814; color:#ddd; box-sizing:border-box; padding:12px; overflow:auto;">
-            <h3 style="margin-top:0;">Stats</h3>
-            <p>Inventory</p>
-        </aside>
+    <div class="container">
+        <div class="case-file">
+            <div class="case-header">
+                <h1 class="typewriter">CONFIDENTIAL CASE FILE</h1>
+                <div class="case-number">CASE #2024-001</div>
+            </div>
+            
+            <div class="case-content">
+                <div class="seal">🔍</div>
+                <h2>Welcome, Detective</h2>
+                <p class="intro-text">
+                    You've been assigned to solve a series of mysteries scattered across different locations. 
+                    Each location contains a QR code that will reveal a riddle leading you to the next clue.
+                </p>
+                <p class="intro-text">
+                    Your mission: Follow the clues, solve the riddles, and uncover the truth hidden in plain sight.
+                </p>
+                
+                <div class="instructions">
+                    <h3>How to Play:</h3>
+                    <ol>
+                        <li>Visit each location in order</li>
+                        <li>Scan the QR code at that location</li>
+                        <li>Read the riddle carefully</li>
+                        <li>Decipher the clue to find the next location</li>
+                        <li>Complete all 5 riddles to solve the case</li>
+                    </ol>
+                </div>
+                
+                <div class="start-button-container">
+                    <a href="riddle1.html" class="btn-primary">Begin Investigation</a>
+                </div>
+            </div>
+            
+            <div class="case-footer">
+                <p class="footer-text">Keep your wits about you, detective. The truth awaits.</p>
+            </div>
+        </div>
     </div>
-
-    <script src="sketch.js"></script>
 </body>
 </html>
+
