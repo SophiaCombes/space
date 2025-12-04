@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Your Location - Detective Mystery</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .building-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .building-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #4a4a5e;
+            border-radius: 8px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            color: #e8e8e8;
+        }
+
+        .building-card:hover {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: #d4af37;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .building-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .building-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .building-description {
+            font-size: 0.9em;
+            color: #d0d0d0;
+            line-height: 1.5;
+        }
+
+        .building-card.correct {
+            animation: correctPulse 0.6s ease;
+        }
+
+        .building-card.incorrect {
+            animation: shake 0.5s ease;
+            background: rgba(220, 53, 69, 0.2);
+            border-color: #dc3545;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); background: rgba(40, 167, 69, 0.2); border-color: #28a745; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback-message {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 1.1em;
+            display: none;
+        }
+
+        .feedback-message.show {
+            display: block;
+        }
+
+        .feedback-message.correct {
+            background: rgba(40, 167, 69, 0.2);
+            border: 2px solid #28a745;
+            color: #90ee90;
+        }
+
+        .feedback-message.incorrect {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+        }
+
+        .selector-instruction {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px dashed #d4af37;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            color: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="case-file riddle-container">
+            <div class="case-header">
+                <div class="riddle-number">LOCATION CHOICE</div>
+                <h1 class="typewriter">WHERE NEXT?</h1>
+            </div>
+            
+            <div class="case-content">
+                <div class="selector-instruction">
+                    <p>Based on the clue you've discovered, which building should you visit next?</p>
+                    <p style="margin-top: 10px; font-style: italic; color: #8b8b9e;">Choose wisely, detective. Your path depends on it.</p>
+                </div>
+
+                <div class="feedback-message" id="feedbackMessage"></div>
+
+                <div class="building-grid" id="buildingGrid">
+                    <!-- Buildings will be populated by JavaScript -->
+                </div>
+                
+                <div class="navigation-buttons" style="margin-top: 40px;">
+                    <a href="javascript:history.back()" class="btn-secondary">← Back to Riddle</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Building data for each riddle
+        const buildingsByRiddle = {
+            1: {
+                correct: 'library',
+                buildings: [
+                    { id: 'library', name: 'Library', icon: '📚', description: 'A quiet sanctuary of knowledge' },
+                    { id: 'art-building', name: 'Art Building', icon: '🎨', description: 'Where creativity comes alive' },
+                    { id: 'cafeteria', name: 'Cafeteria', icon: '🍽️', description: 'A hub for food and socializing' },
+                    { id: 'student-union', name: 'Student Union', icon: '👥', description: 'Central gathering place' }
+                ]
+            },
+            2: {
+                correct: 'quad',
+                buildings: [
+                    { id: 'quad', name: 'Quad/Campus Green', icon: '🌿', description: 'Open outdoor space' },
+                    { id: 'gym', name: 'Gymnasium', icon: '🏋️', description: 'Athletic training facility' },
+                    { id: 'observatory', name: 'Observatory', icon: '🔭', description: 'For stargazing and astronomy' },
+                    { id: 'dormitory', name: 'Dormitory', icon: '🏠', description: 'Student residence halls' }
+                ]
+            },
+            3: {
+                correct: 'theatre',
+                buildings: [
+                    { id: 'theatre', name: 'Theatre', icon: '🎭', description: 'Where performances happen' },
+                    { id: 'lab', name: 'Science Lab', icon: '⚗️', description: 'Laboratory for research' },
+                    { id: 'music-hall', name: 'Music Hall', icon: '🎵', description: 'Venue for musical events' },
+                    { id: 'chapel', name: 'Chapel', icon: '⛪', description: 'Spiritual sanctuary' }
+                ]
+            },
+            4: {
+                correct: 'computer-center',
+                buildings: [
+                    { id: 'computer-center', name: 'Computer Center', icon: '💻', description: 'Tech hub for students' },
+                    { id: 'bookstore', name: 'Bookstore', icon: '🛍️', description: 'Books and supplies' },
+                    { id: 'health-center', name: 'Health Center', icon: '⚕️', description: 'Medical services' },
+                    { id: 'archive', name: 'Archive', icon: '📋', description: 'Historical records storage' }
+                ]
+            },
+            5: {
+                correct: 'admin-building',
+                buildings: [
+                    { id: 'admin-building', name: 'Administration Building', icon: '🏛️', description: 'Heart of campus operations' },
+                    { id: 'clock-tower', name: 'Clock Tower', icon: '⏰', description: 'Iconic campus landmark' },
+                    { id: 'fountain', name: 'Fountain Plaza', icon: '⛲', description: 'Scenic outdoor plaza' },
+                    { id: 'stadium', name: 'Stadium', icon: '🏟️', description: 'Sports and events venue' }
+                ]
+            }
+        };
+
+        // Get current riddle number from URL or use a default
+        function getCurrentRiddle() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return parseInt(urlParams.get('riddle')) || 1;
+        }
+
+        // Generate next page URL based on correct answer
+        function getNextPageUrl(riddle) {
+            if (riddle === 5) {
+                return 'complete.html';
+            }
+            return `riddle${riddle + 1}.html`;
+        }
+
+        // Initialize the building selector
+        function initBuildingSelector() {
+            const riddle = getCurrentRiddle();
+            const data = buildingsByRiddle[riddle];
+            
+            if (!data) return;
+
+            const grid = document.getElementById('buildingGrid');
+            grid.innerHTML = '';
+
+            data.buildings.forEach(building => {
+                const card = document.createElement('div');
+                card.className = 'building-card';
+                card.innerHTML = `
+                    <span class="building-icon">${building.icon}</span>
+                    <div class="building-name">${building.name}</div>
+                    <div class="building-description">${building.description}</div>
+                `;
+                
+                card.addEventListener('click', () => selectBuilding(building.id, data.correct, riddle));
+                grid.appendChild(card);
+            });
+        }
+
+        // Handle building selection
+        function selectBuilding(selectedId, correctId, riddle) {
+            const feedback = document.getElementById('feedbackMessage');
+            const cards = document.querySelectorAll('.building-card');
+            
+            cards.forEach(card => {
+                card.style.pointerEvents = 'none';
+                card.style.opacity = '0.6';
+            });
+
+            const selectedCard = Array.from(cards).find(card => 
+                card.textContent.toLowerCase().includes(
+                    buildingsByRiddle[riddle].buildings.find(b => b.id === selectedId).name.toLowerCase()
+                )
+            );
+
+            if (selectedId === correctId) {
+                feedback.className = 'feedback-message show correct';
+                feedback.textContent = '✓ Correct! You found the right location. Proceeding to the next clue...';
+                selectedCard.classList.add('correct');
+                
+                setTimeout(() => {
+                    window.location.href = getNextPageUrl(riddle);
+                }, 1500);
+            } else {
+                feedback.className = 'feedback-message show incorrect';
+                feedback.textContent = '✗ Incorrect. This is not the location from the clue. Try again.';
+                selectedCard.classList.add('incorrect');
+                
+                setTimeout(() => {
+                    cards.forEach(card => {
+                        card.style.pointerEvents = 'auto';
+                        card.style.opacity = '1';
+                        card.classList.remove('incorrect');
+                    });
+                    feedback.classList.remove('show');
+                }, 1500);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initBuildingSelector);
+    </script>
+</body>
+</html>
