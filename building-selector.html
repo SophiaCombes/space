@@ -119,8 +119,8 @@
             
             <div class="case-content">
                 <div class="selector-instruction">
-                    <p>Based on the clue you've discovered, which building should you visit next?</p>
-                    <p style="margin-top: 10px; font-style: italic; color: #8b8b9e;">Choose wisely, detective. Your path depends on it.</p>
+                    <p>Based on the pirate clue ye've deciphered, which port should ye sail to next?</p>
+                    <p style="margin-top: 10px; font-style: italic; color: #8b8b9e;">Choose wisely, sailor. Each correct port brings ye closer to Davy Jones' booty.</p>
                 </div>
 
                 <div class="feedback-message" id="feedbackMessage"></div>
@@ -195,9 +195,19 @@
         // Generate next page URL based on correct answer
         function getNextPageUrl(riddle) {
             if (riddle === 5) {
-                return 'complete.html';
+                return 'mini-game.html';
             }
             return `riddle${riddle + 1}.html`;
+        }
+
+        // Shuffle array using Fisher-Yates algorithm
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
         }
 
         // Initialize the building selector
@@ -210,7 +220,10 @@
             const grid = document.getElementById('buildingGrid');
             grid.innerHTML = '';
 
-            data.buildings.forEach(building => {
+            // Shuffle the buildings array so correct answer is in random position
+            const shuffledBuildings = shuffleArray(data.buildings);
+
+            shuffledBuildings.forEach(building => {
                 const card = document.createElement('div');
                 card.className = 'building-card';
                 card.innerHTML = `

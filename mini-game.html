@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find the Key - Detective Mystery</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .mini-game-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .game-board {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            aspect-ratio: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 3px solid #4a4a5e;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .emoji-item {
+            position: absolute;
+            font-size: 3em;
+            cursor: grab;
+            user-select: none;
+            transition: filter 0.1s ease;
+        }
+
+        .emoji-item:hover {
+            filter: brightness(1.2);
+        }
+
+        .emoji-item.dragging {
+            opacity: 0.8;
+            cursor: grabbing;
+            z-index: 100;
+        }
+
+        .emoji-item.key {
+            filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+        }
+
+        .lock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .lock-drop-zone {
+            width: 100px;
+            height: 100px;
+            border: 3px solid #fff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.4),
+                inset 0 0 15px rgba(212, 175, 55, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .lock-drop-zone.drag-over {
+            background: rgba(40, 167, 69, 0.2);
+            border-color: #28a745;
+            box-shadow: 
+                0 0 30px rgba(40, 167, 69, 0.6),
+                inset 0 0 15px rgba(40, 167, 69, 0.2);
+        }
+
+        .lock-drop-zone.unlocked {
+            animation: unlockPulse 0.8s ease;
+            background: rgba(40, 167, 69, 0.3);
+            border-color: #28a745;
+        }
+
+        .lock-label {
+            font-size: 0.9em;
+            color: #d0d0d0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .game-instruction {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px dashed #d4af37;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            color: #d0d0d0;
+        }
+
+        .game-instruction h3 {
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: rgba(40, 167, 69, 0.2);
+            border: 2px solid #28a745;
+            border-radius: 5px;
+            color: #90ee90;
+            margin: 20px 0;
+            font-size: 1.1em;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes unlockPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 800px) {
+            .mini-game-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .game-board {
+                max-width: 100%;
+            }
+
+            .emoji-item {
+                font-size: 2.5em;
+            }
+
+            .lock-drop-zone {
+                width: 80px;
+                height: 80px;
+                font-size: 3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="case-file riddle-container">
+            <div class="case-header">
+                <div class="riddle-number">FINAL CHALLENGE</div>
+                <h1 class="typewriter">FIND THE KEY</h1>
+            </div>
+            
+            <div class="case-content">
+                <div class="game-instruction">
+                    <h3>🔑 The Final Battle</h3>
+                    <p>The key to the treasure chest be hidden amongst the scattered booty. Move the other items aside to reveal the key, then drag it to the lock to claim yer riches!</p>
+                </div>
+
+                <div class="success-message" id="successMessage">
+                    ✓ Case Unlocked! You've successfully solved the mystery. Proceed to complete your investigation...
+                </div>
+
+                <div class="mini-game-container">
+                    <div class="game-board" id="gameBoard"></div>
+                    <div class="lock-container">
+                        <div class="lock-label">Drag the key to the chest lock, matey</div>
+                            <div class="lock-drop-zone" id="lockDropZone">🔐</div>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons" style="margin-top: 40px;">
+                    <a href="riddle5.html" class="btn-secondary">← Back to Riddle</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gameBoard = document.getElementById('gameBoard');
+        const lockDropZone = document.getElementById('lockDropZone');
+        const successMessage = document.getElementById('successMessage');
+        const navigationButtons = document.querySelector('.navigation-buttons');
+
+        // Define colors for emoji groups
+        const colorGroups = {
+            red: ['❤️', '🌹', '🍎', '🎈', '🎁', '⛔', '🛑', '🔴'],
+            blue: ['💙', '🌊', '🐟', '💎', '🧊', '🍇', '🫐', '🔵'],
+            yellow: ['💛', '⭐', '🌟', '🌻', '✨', '🍌', '🌙', '🔶'],
+            green: ['💚', '🌿', '🍃', '🐢', '🐸', '🍏', '🦗', '🔵'],
+            purple: ['💜', '🍇', '👾', '🦄', '🪻', '🔮', '🌺', '🎀']
+        };
+
+        let selectedColor;
+        let keyEmoji;
+        let decoyEmojis = [];
+        let draggedElement = null;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        function initGame() {
+            // The key is always 🔑
+            keyEmoji = '🔑';
+            
+            // Randomly select a color group for decoys
+            const colors = Object.keys(colorGroups);
+            selectedColor = colors[Math.floor(Math.random() * colors.length)];
+            const emojiList = colorGroups[selectedColor];
+            
+            // Get emojis as decoys
+            decoyEmojis = emojiList;
+
+            // Clear the game board
+            gameBoard.innerHTML = '';
+
+            // Create key emoji
+            const keyElement = createEmojiElement(keyEmoji, true);
+            gameBoard.appendChild(keyElement);
+
+            // Create exactly 50 decoy emojis (user requested fixed count)
+            const decoyCount = 50;
+            for (let i = 0; i < decoyCount; i++) {
+                const decoy = decoyEmojis[Math.floor(Math.random() * decoyEmojis.length)];
+                const decoyElement = createEmojiElement(decoy, false);
+                gameBoard.appendChild(decoyElement);
+            }
+
+            // Position all emojis randomly
+            positionEmojisRandomly();
+        }
+
+        function createEmojiElement(emoji, isKey) {
+            const element = document.createElement('div');
+            element.className = 'emoji-item' + (isKey ? ' key' : '');
+            element.textContent = emoji;
+            element.draggable = false;
+            
+            if (isKey) {
+                element.addEventListener('mousedown', handleKeyMouseDown);
+            } else {
+                element.addEventListener('mousedown', handleDecoyMouseDown);
+            }
+            
+            return element;
+        }
+
+        function positionEmojisRandomly() {
+            const emojis = gameBoard.querySelectorAll('.emoji-item');
+            const boardRect = gameBoard.getBoundingClientRect();
+            const boardWidth = boardRect.width;
+            const boardHeight = boardRect.height;
+
+            emojis.forEach(emoji => {
+                const randomX = Math.random() * (boardWidth - 60);
+                const randomY = Math.random() * (boardHeight - 60);
+                emoji.style.left = randomX + 'px';
+                emoji.style.top = randomY + 'px';
+            });
+        }
+
+        // Handle dragging the key to the lock
+        function handleKeyMouseDown(e) {
+            const element = this;
+            draggedElement = element;
+            
+            const rect = element.getBoundingClientRect();
+            
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            
+            element.classList.add('dragging');
+
+            function handleMouseMove(moveEvent) {
+                const x = moveEvent.clientX;
+                const y = moveEvent.clientY;
+
+                // Position element at cursor
+                element.style.position = 'fixed';
+                element.style.left = (x - offsetX) + 'px';
+                element.style.top = (y - offsetY) + 'px';
+                element.style.zIndex = '1000';
+            }
+
+            function handleMouseUp(upEvent) {
+                element.classList.remove('dragging');
+                
+                // Check if dropped on lock zone
+                const lockRect = lockDropZone.getBoundingClientRect();
+                if (upEvent.clientX >= lockRect.left && 
+                    upEvent.clientX <= lockRect.right &&
+                    upEvent.clientY >= lockRect.top && 
+                    upEvent.clientY <= lockRect.bottom) {
+                    unlockSuccess();
+                } else {
+                    // Return to board
+                    const boardRect = gameBoard.getBoundingClientRect();
+                    element.style.position = 'absolute';
+                    element.style.left = (Math.random() * (boardRect.width - 60)) + 'px';
+                    element.style.top = (Math.random() * (boardRect.height - 60)) + 'px';
+                    element.style.zIndex = 'auto';
+                }
+                
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            }
+
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+
+        // Handle moving decoy emojis within the board
+        function handleDecoyMouseDown(e) {
+            const element = this;
+            draggedElement = element;
+            
+            const rect = element.getBoundingClientRect();
+            const boardRect = gameBoard.getBoundingClientRect();
+            
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            
+            element.classList.add('dragging');
+
+            function handleMouseMove(moveEvent) {
+                const boardRect = gameBoard.getBoundingClientRect();
+                let x = moveEvent.clientX - boardRect.left - offsetX;
+                let y = moveEvent.clientY - boardRect.top - offsetY;
+
+                // Keep within bounds
+                x = Math.max(0, Math.min(x, boardRect.width - 60));
+                y = Math.max(0, Math.min(y, boardRect.height - 60));
+
+                element.style.left = x + 'px';
+                element.style.top = y + 'px';
+            }
+
+            function handleMouseUp() {
+                element.classList.remove('dragging');
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            }
+
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+
+
+        function unlockSuccess() {
+            lockDropZone.classList.add('unlocked');
+            successMessage.classList.add('show');
+
+            // Replace the lock with unlocked state
+            lockDropZone.textContent = '🔓';
+
+            // Disable all dragging
+            const emojis = gameBoard.querySelectorAll('.emoji-item');
+            emojis.forEach(emoji => {
+                emoji.draggable = false;
+                emoji.style.pointerEvents = 'none';
+                emoji.style.opacity = '0.6';
+            });
+
+            // Update navigation
+            navigationButtons.innerHTML = '';
+            const nextButton = document.createElement('a');
+            nextButton.href = 'complete.html';
+            nextButton.className = 'btn-primary';
+            nextButton.textContent = 'Complete Case →';
+            navigationButtons.appendChild(nextButton);
+
+            setTimeout(() => {
+                window.location.href = 'complete.html';
+            }, 2000);
+        }
+
+        // Initialize the game when page loads
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>

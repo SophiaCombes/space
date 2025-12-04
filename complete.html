@@ -3,47 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case Solved - Detective Mystery</title>
+    <title>Treasure Found - Pirate Victory</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .case-file.treasure-complete {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #daa520 100%);
+            border: 3px solid #b8860b;
+        }
+
+        .case-file.treasure-complete .typewriter {
+            color: #8b4513;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .case-file.treasure-complete h2 {
+            color: #8b4513;
+        }
+
+        .case-file.treasure-complete .case-header {
+            border-bottom-color: #b8860b;
+        }
+
+        .case-file.treasure-complete .case-footer {
+            border-top-color: #b8860b;
+        }
+
+        .case-file.treasure-complete .success-text {
+            color: #5a3a1a;
+        }
+
+        .case-file.treasure-complete .hint-text {
+            color: #5a3a1a;
+        }
+
+        .case-file.treasure-complete .instructions {
+            background: rgba(139, 69, 19, 0.1);
+            border-left-color: #8b4513;
+        }
+
+        .case-file.treasure-complete .instructions h3 {
+            color: #8b4513;
+        }
+
+        .case-file.treasure-complete .footer-text {
+            color: #5a3a1a;
+        }
+
+        .completion-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="case-file">
+        <div class="case-file treasure-complete">
             <div class="case-header">
-                <h1 class="typewriter">CASE CLOSED</h1>
-                <div class="case-number">CASE #2024-001 - RESOLVED</div>
+                <h1 class="typewriter">YE FOUND THE BOOTY!</h1>
+                <div class="case-number">CREW #2025-101 - VICTORIOUS</div>
             </div>
-            
+
             <div class="case-content completion-message">
-                <div class="completion-icon">🎯</div>
-                
-                <h2>Congratulations, Detective!</h2>
-                
+                <div class="completion-icon">💰</div>
+
+                <h2>Hoist the Colors, Captain!</h2>
+
                 <p class="success-text">
-                    You've successfully navigated through all five locations,<br>
-                    solved every riddle, and completed the investigation.
+                    Ye've sailed through five ports, deciphered every pirate riddle, and found the legendary treasure chest!
+                    With the key in hand ye unlocked the chest and claimed the golden booty of Davy Jones.
+                    As a reward fer yer bravery and cunning, the college bestows upon ye free tuition fer the rest of yer years in school. Drink to yer victory, sailor!
                 </p>
-                
+
                 <div class="instructions">
-                    <h3>Mission Accomplished</h3>
+                    <h3>⚓ Victory Claimed</h3>
                     <p class="hint-text">
-                        Your keen observation skills and deductive reasoning have led you to success. 
-                        You've proven yourself to be an exceptional detective, following clues with 
-                        precision and solving mysteries that would challenge even the most experienced investigators.
+                        Yer courage, wit, and determination have made ye a legendary pirate of the seven seas! The campus treasure be rightfully yers. Well sailed, captain!
                     </p>
                     <p class="hint-text" style="margin-top: 15px;">
-                        The case is now closed, but your journey as a detective has only just begun. 
-                        Keep your magnifying glass ready—there are always more mysteries waiting to be solved.
+                        Got the taste fer more adventure? Hoist the sails fer another hunt and leave a new treasure fer fellow buccaneers to discover.
                     </p>
                 </div>
-                
+
                 <div class="navigation-buttons">
-                    <a href="index.html" class="btn-primary">Start New Case</a>
+                    <a href="index.html" class="btn-primary">Set Sail Again ⚓</a>
                 </div>
             </div>
-            
+
             <div class="case-footer">
-                <p class="footer-text">Well done, detective. Until the next mystery calls...</p>
+                <p class="footer-text">Raise a glass, ye scallywag! More treasures be waitin' on the horizon...</p>
             </div>
         </div>
     </div>
